@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="زونکن من">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#0b6fd4">
+<link rel="apple-touch-icon" id="touchIcon" href="">
+<title>زونکن من</title>
+<style>
+:root{
+  color-scheme:light;
+  --paper:#ffffff; --card:#ffffff; --ink:#111111; --muted:#66727e; --rule:#e2e8ee;
+  --teal:#0b6fd4; --teal-ink:#ffffff; --teal-soft:#e8f2fc;
+  --green:#0f9d63; --green-soft:#e3f5ec; --green-ink:#0a7a4c;
+  --lapis:#0a5cc0; --brick:#c2453a; --brick-soft:#fbe9e6; --focus:#f2a900;
+  --shadow:0 1px 3px rgba(20,40,70,.06);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--paper);color:var(--ink)}
+body{
+  font-family:-apple-system,system-ui,"SF Arabic","Geeza Pro",Tahoma,sans-serif;
+  font-size:15px;line-height:1.8;font-weight:400;
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) calc(90px + env(safe-area-inset-bottom)) env(safe-area-inset-left);
+}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.wrap{max-width:640px;margin:0 auto}
+
+/* header */
+.top{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 6px}
+.top h1{margin:0;font-size:22px;font-weight:700;letter-spacing:0}
+.iconbtn{border:1px solid var(--rule);background:var(--card);border-radius:12px;width:42px;height:42px;display:grid;place-items:center;font-size:18px}
+
+/* price finder: the main tool */
+.finder{position:sticky;top:0;z-index:5;background:var(--paper);padding:8px 16px 10px;border-bottom:1px solid var(--rule)}
+.finder h2{margin:0 0 6px;font-size:13px;font-weight:700;color:var(--muted)}
+.pricebar{display:flex;gap:8px;align-items:center;background:var(--card);border:2px solid var(--teal);border-radius:16px;padding:8px 10px}
+.pricebar label{display:flex;align-items:center;gap:6px;flex:1;min-width:0;font-size:13px;color:var(--muted)}
+.pricebar input{width:100%;min-width:0;border:0;background:transparent;font-size:22px;font-weight:700;color:var(--ink);text-align:center;padding:2px 0;direction:ltr}
+.pricebar input::placeholder{color:var(--rule);font-weight:600}
+.pricebar select{border:0;background:var(--teal-soft);color:var(--ink);border-radius:10px;padding:6px 8px;font-weight:700}
+.chips{display:flex;gap:6px;overflow-x:auto;padding:10px 0 2px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1px solid var(--rule);background:var(--card);border-radius:999px;padding:4px 13px;font-size:14px}
+.chip[aria-pressed="true"]{background:var(--teal);border-color:var(--teal);color:var(--teal-ink);font-weight:700}
+.moretoggle{display:none}
+.linkbtn{background:none;border:0;color:var(--teal);font-weight:700;padding:6px 0}
+.adv{display:none;grid-template-columns:1fr 1fr;gap:8px;padding:6px 0 2px}
+.adv.open{display:grid}
+.adv input,.adv select{width:100%;border:1px solid var(--rule);background:var(--card);border-radius:10px;padding:8px 10px}
+.adv .full{grid-column:1/-1}
+
+/* neighborhoods as binder tabs */
+.hoods{display:flex;gap:0;overflow-x:auto;padding:12px 16px 0;scrollbar-width:none;border-bottom:2px solid var(--teal)}
+.hoods::-webkit-scrollbar{display:none}
+.tab{flex:none;border:1px solid var(--rule);border-bottom:0;background:var(--paper);color:var(--muted);padding:6px 14px;border-radius:12px 12px 0 0;margin-inline-start:-1px;font-size:14px}
+.tab b{font-weight:700;margin-inline-start:4px;font-size:12px}
+.tab[aria-selected="true"]{background:var(--teal);border-color:var(--teal);color:var(--teal-ink);font-weight:700}
+
+/* results */
+.summary{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 16px 4px;font-size:14px;color:var(--muted)}
+.summary strong{color:var(--ink)}
+.hoodhead{margin:16px 16px 6px;font-size:14px;font-weight:700;color:var(--green-ink);display:flex;align-items:center;gap:8px}
+.hoodhead::after{content:"";flex:1;height:1px;background:var(--rule)}
+.card{background:var(--card);border:1px solid var(--rule);border-radius:14px;margin:8px 16px;padding:12px 14px;box-shadow:var(--shadow)}
+.row1{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.price{font-size:21px;font-weight:700;color:var(--lapis);line-height:1.3}
+.price small{font-size:12px;font-weight:500;color:var(--muted);margin-inline-start:4px}
+.rent{font-size:13px;color:var(--muted)}
+.tag{font-size:12px;border-radius:8px;padding:1px 9px;background:var(--green-soft);color:var(--green-ink)!important;color:var(--ink);white-space:nowrap}
+.tag.arch{background:var(--brick-soft);color:var(--brick)!important}
+.where{margin-top:4px;font-weight:700}
+.addr{font-size:13px;color:var(--muted)}
+.specs{display:grid;grid-template-columns:repeat(4,1fr);margin:10px 0 6px;border:1px solid var(--rule);border-radius:10px;overflow:hidden}
+.specs div{padding:5px 4px;text-align:center;border-inline-start:1px solid var(--rule)}
+.specs div:first-child{border-inline-start:0}
+.specs span{display:block;font-size:11px;color:var(--muted)}
+.specs b{font-size:15px}
+.feat{display:flex;flex-wrap:wrap;gap:5px;margin:6px 0}
+.feat i{font-style:normal;font-size:12px;border:1px solid var(--green-soft);background:var(--green-soft);color:var(--green-ink);border-radius:7px;padding:0 8px}
+.note{font-size:13px;color:var(--muted);margin:4px 0}
+.owner{font-size:13px}
+.actions{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.btn{border:1px solid var(--rule);background:var(--card);border-radius:10px;padding:5px 12px;font-size:14px}
+.btn.main{background:var(--teal);border-color:var(--teal);color:var(--teal-ink);font-weight:700}
+.btn.danger{color:var(--brick)}
+.empty{margin:36px 24px;text-align:center;color:var(--muted)}
+.empty h3{color:var(--ink);margin:0 0 6px}
+
+/* add button */
+.fab{position:fixed;inset-inline-start:16px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:6;background:var(--teal);color:var(--teal-ink);border:0;border-radius:16px;padding:12px 20px;font-weight:700;font-size:16px;box-shadow:0 6px 18px rgba(11,111,212,.30)}
+
+/* sheets */
+.veil{position:fixed;inset:0;background:rgba(232,242,252,.82);z-index:20;display:none}
+.veil.open{display:block}
+.sheet{box-shadow:0 -4px 24px rgba(11,111,212,.18);position:fixed;inset-inline:0;bottom:0;z-index:21;background:var(--paper);border-radius:20px 20px 0 0;max-height:92vh;overflow-y:auto;display:none;padding:14px 16px calc(24px + env(safe-area-inset-bottom));max-width:640px;margin:0 auto}
+.sheet.open{display:block}
+.sheet h2{margin:0 0 10px;font-size:18px}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fgrid .full{grid-column:1/-1}
+.field label{display:block;font-size:13px;color:var(--muted);margin-bottom:2px}
+.field input,.field select,.field textarea{width:100%;border:1px solid var(--rule);background:var(--card);border-radius:10px;padding:9px 11px}
+.field textarea{min-height:70px;resize:vertical}
+.pair{display:flex;gap:6px}
+.pair select{width:96px;flex:none}
+.checks{display:flex;gap:14px;flex-wrap:wrap}
+.checks label{display:flex;gap:6px;align-items:center;color:var(--ink);font-size:14px}
+.sheetbtns{display:flex;gap:8px;margin-top:16px}
+.sheetbtns .btn{flex:1;padding:11px;font-size:16px}
+.hint{font-size:13px;color:var(--muted);margin:8px 0}
+.banner{margin:8px 16px 0;padding:8px 12px;border-radius:10px;background:var(--brick-soft);font-size:13px}
+.toast{position:fixed;inset-inline:0;bottom:calc(86px + env(safe-area-inset-bottom));margin:auto;width:max-content;max-width:88%;background:var(--teal);color:var(--teal-ink);padding:8px 16px;border-radius:12px;z-index:30;opacity:0;pointer-events:none;transition:opacity .2s}
+.toast.show{opacity:1}
+@media (prefers-reduced-motion: reduce){.toast{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <h1>زونکن من</h1>
+    <button class="iconbtn" id="btnSettings" aria-label="تنظیمات و پشتیبان‌گیری">⚙</button>
+  </div>
+  <div id="banner"></div>
+
+  <section class="finder" aria-label="جستجوی قیمت">
+    <h2>جستجو بر اساس قیمت (یا ودیعه)</h2>
+    <div class="pricebar">
+      <label>از <input id="fMin" inputmode="decimal" placeholder="۷۰" aria-label="حداقل قیمت"></label>
+      <label>تا <input id="fMax" inputmode="decimal" placeholder="۸۰" aria-label="حداکثر قیمت"></label>
+      <select id="fUnit" aria-label="واحد">
+        <option value="1000">میلیارد</option>
+        <option value="1">میلیون</option>
+      </select>
+    </div>
+    <div class="chips" id="typeChips" role="group" aria-label="نوع معامله"></div>
+    <button class="linkbtn" id="btnAdv">فیلتر بیشتر (متراژ، خواب، جستجوی متن)</button>
+    <div class="adv" id="adv">
+      <input id="fAreaMin" inputmode="numeric" placeholder="حداقل متراژ">
+      <input id="fAreaMax" inputmode="numeric" placeholder="حداکثر متراژ">
+      <select id="fRooms"><option value="">تعداد خواب: همه</option><option>1</option><option>2</option><option>3</option><option>4</option></select>
+      <select id="fKind"><option value="">نوع ملک: همه</option></select>
+      <input class="full" id="fQ" placeholder="جستجو در آدرس، مالک، توضیحات">
+      <label class="full"><input type="checkbox" id="fArch"> نمایش بایگانی‌شده‌ها</label>
+    </div>
+  </section>
+
+  <div class="hoods" id="hoods" role="tablist" aria-label="محله‌ها"></div>
+  <div class="summary" id="summary"></div>
+  <main id="list"></main>
+</div>
+
+<button class="fab" id="btnAdd">+ فایل جدید</button>
+<div class="veil" id="veil"></div>
+
+<!-- add / edit -->
+<section class="sheet" id="formSheet" aria-label="فرم فایل">
+  <h2 id="formTitle">فایل جدید</h2>
+  <div class="fgrid">
+    <div class="field"><label for="a_type">نوع معامله</label><select id="a_type"></select></div>
+    <div class="field"><label for="a_kind">نوع ملک</label><select id="a_kind"></select></div>
+    <div class="field"><label for="a_hood">محله</label><input id="a_hood" list="hoodList" autocomplete="off"><datalist id="hoodList"></datalist></div>
+    <div class="field"><label for="a_area">متراژ</label><input id="a_area" inputmode="numeric"></div>
+    <div class="field"><label for="a_floor">طبقه</label><input id="a_floor" inputmode="numeric"></div>
+    <div class="field"><label for="a_rooms">تعداد خواب</label><input id="a_rooms" inputmode="numeric"></div>
+    <div class="field"><label for="a_year">سال ساخت</label><input id="a_year" inputmode="numeric" placeholder="۱۴۰۰"></div>
+    <div class="field"><label for="a_units">واحد در طبقه / تعداد کل طبقات</label><input id="a_units" inputmode="numeric"></div>
+    <div class="field full"><label for="a_price" id="a_priceLabel">قیمت کل</label>
+      <div class="pair"><input id="a_price" inputmode="decimal"><select id="a_pu"><option value="1000">میلیارد</option><option value="1">میلیون</option></select></div></div>
+    <div class="field full" id="rentBox" hidden><label for="a_rent">اجاره ماهانه</label>
+      <div class="pair"><input id="a_rent" inputmode="decimal"><select id="a_ru"><option value="1">میلیون</option><option value="1000">میلیارد</option></select></div></div>
+    <div class="field full"><label for="a_addr">آدرس یا نشانی</label><input id="a_addr"></div>
+    <div class="field full"><label>امکانات</label>
+      <div class="checks" id="a_feats"></div></div>
+    <div class="field"><label for="a_owner">نام مالک</label><input id="a_owner"></div>
+    <div class="field"><label for="a_phone">تلفن مالک</label><input id="a_phone" inputmode="tel"></div>
+    <div class="field full"><label for="a_notes">توضیحات</label><textarea id="a_notes"></textarea></div>
+  </div>
+  <div class="sheetbtns">
+    <button class="btn main" id="btnSave">ذخیره فایل</button>
+    <button class="btn" id="btnCancel">انصراف</button>
+  </div>
+</section>
+
+<!-- settings -->
+<section class="sheet" id="setSheet" aria-label="تنظیمات">
+  <h2>پشتیبان‌گیری</h2>
+  <p class="hint">فایل‌ها فقط روی همین گوشی ذخیره می‌شن. هر چند وقت یک بار پشتیبان بگیر و جایی مثل Files یا تلگرام نگه دار. اگه گوشی عوض شد یا اطلاعات پاک شد، از همون فایل برمی‌گردونی.</p>
+  <div class="sheetbtns" style="flex-direction:column">
+    <button class="btn main" id="btnBackup">گرفتن پشتیبان</button>
+    <button class="btn" id="btnRestore">بازیابی از فایل پشتیبان</button>
+    <input type="file" id="restoreFile" accept=".json,application/json" hidden>
+    <button class="btn" id="btnCloseSet">بستن</button>
+  </div>
+  <p class="hint" id="countInfo"></p>
+</section>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(function(){
+'use strict';
+var TYPES=['فروش','رهن و اجاره','پیش‌فروش','مشارکت در ساخت'];
+var KINDS=['آپارتمان','زمین','مغازه','ویلا و باغ','اداری','سایر'];
+var FEATS=['پارکینگ','انباری','آسانسور','بالکن','سند تک‌برگ'];
+var KEY='zoonkan.files.v1';
+
+/* ---------- helpers ---------- */
+var FA='۰۱۲۳۴۵۶۷۸۹',AR='٠١٢٣٤٥٦٧٨٩';
+function toEn(s){return String(s==null?'':s).replace(/[۰-۹]/g,function(d){return FA.indexOf(d)}).replace(/[٠-٩]/g,function(d){return AR.indexOf(d)}).replace(/٫/g,'.').replace(/[,٬،\s]/g,'')}
+function num(s){var v=parseFloat(toEn(s));return isNaN(v)?null:v}
+function fa(n){return Number(n).toLocaleString('fa-IR',{maximumFractionDigits:2})}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function money(m){if(m==null)return '—';return m>=1000?fa(m/1000)+' میلیارد':fa(m)+' میلیون'}
+function $(id){return document.getElementById(id)}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
+
+/* ---------- storage (falls back to memory if the browser blocks it) ---------- */
+var store=null;
+try{localStorage.setItem('_z','1');localStorage.removeItem('_z');store=localStorage}catch(e){store=null}
+var files=[];
+try{files=store?(JSON.parse(store.getItem(KEY))||[]):[]}catch(e){files=[]}
+function save(){if(store){try{store.setItem(KEY,JSON.stringify(files))}catch(e){toast('ذخیره نشد؛ حافظه‌ی مرورگر پر یا بسته است')}}}
+if(!store){$('banner').innerHTML='<div class="banner">در این حالت پیش‌نمایش، اطلاعات ذخیره نمی‌شه. روی گوشی از طریق لینک اصلی باز کن تا ذخیره بشه.</div>'}
+
+/* ---------- state ---------- */
+var F={type:'',hood:'',kind:'',rooms:'',q:'',arch:false};
+
+function priceVal(f){return f.price==null?null:f.price}
+
+function match(f,skipHood){
+  if(F.arch!==!!f.archived)return false;
+  if(F.type&&f.type!==F.type)return false;
+  if(!skipHood&&F.hood&&f.hood!==F.hood)return false;
+  if(F.kind&&f.kind!==F.kind)return false;
+  if(F.rooms&&String(f.rooms)!==F.rooms)return false;
+  var u=+$('fUnit').value,mn=num($('fMin').value),mx=num($('fMax').value);
+  if(mn!=null||mx!=null){
+    var p=priceVal(f);if(p==null)return false;
+    if(mn!=null&&p<mn*u)return false;
+    if(mx!=null&&p>mx*u)return false;
+  }
+  var am=num($('fAreaMin').value),ax=num($('fAreaMax').value);
+  if(am!=null&&!(f.area>=am))return false;
+  if(ax!=null&&!(f.area!=null&&f.area<=ax))return false;
+  var q=$('fQ').value.trim();
+  if(q){var hay=[f.addr,f.owner,f.notes,f.hood,f.phone].join(' ');if(hay.indexOf(q)<0)return false}
+  return true;
+}
+
+/* ---------- render ---------- */
+function render(){
+  /* type chips */
+  var tc=$('typeChips');
+  tc.innerHTML=['همه'].concat(TYPES).map(function(t,i){
+    var v=i?t:'';return '<button class="chip" data-type="'+esc(v)+'" aria-pressed="'+(F.type===v)+'">'+esc(t)+'</button>'}).join('');
+
+  /* neighborhood tabs: counts ignore the neighborhood filter itself */
+  var base=files.filter(function(f){return match(f,true)});
+  var counts={};base.forEach(function(f){counts[f.hood]=(counts[f.hood]||0)+1});
+  var names=Object.keys(counts).sort(function(a,b){return a.localeCompare(b,'fa')});
+  if(F.hood&&!counts[F.hood])F.hood='';
+  $('hoods').innerHTML='<button class="tab" role="tab" data-hood="" aria-selected="'+(F.hood==='')+'">همه<b>'+fa(base.length)+'</b></button>'+
+    names.map(function(n){return '<button class="tab" role="tab" data-hood="'+esc(n)+'" aria-selected="'+(F.hood===n)+'">'+esc(n)+'<b>'+fa(counts[n])+'</b></button>'}).join('');
+
+  var list=files.filter(function(f){return match(f,false)});
+  var priceOn=$('fMin').value.trim()||$('fMax').value.trim();
+  list.sort(function(a,b){return priceOn?((a.price||0)-(b.price||0)):(b.createdAt-a.createdAt)});
+
+  /* summary */
+  var s='<span><strong>'+fa(list.length)+'</strong> فایل';
+  if(priceOn){var u=$('fUnit').options[$('fUnit').selectedIndex].text;
+    var mn=$('fMin').value.trim(),mx=$('fMax').value.trim();
+    s+=' '+(mn&&mx?'بین '+fa(num(mn))+' تا '+fa(num(mx)):mn?'از '+fa(num(mn))+' به بالا':'تا '+fa(num(mx)))+' '+u}
+  s+='</span>';
+  if(list.length)s+='<button class="linkbtn" id="btnShareAll">ارسال نتایج</button>';
+  $('summary').innerHTML=s;
+
+  /* list */
+  var out='';
+  if(!files.length){
+    out='<div class="empty"><h3>هنوز فایلی ثبت نکردی</h3><p>با دکمه‌ی «فایل جدید» اولین فایلت رو وارد کن. بعداً با بازه‌ی قیمت پیداش می‌کنی.</p><button class="btn" id="btnSample">بارگذاری ۳ نمونه برای امتحان</button></div>';
+  }else if(!list.length){
+    out='<div class="empty"><h3>فایلی با این شرایط نیست</h3><p>بازه‌ی قیمت یا فیلترها رو کمی باز کن.</p></div>';
+  }else if(F.hood){
+    out=list.map(card).join('');
+  }else{
+    var groups={};list.forEach(function(f){(groups[f.hood]=groups[f.hood]||[]).push(f)});
+    Object.keys(groups).sort(function(a,b){return a.localeCompare(b,'fa')}).forEach(function(h){
+      out+='<div class="hoodhead">'+esc(h)+'</div>'+groups[h].map(card).join('')});
+  }
+  $('list').innerHTML=out;
+
+  /* hood datalist + kind filter */
+  $('hoodList').innerHTML=Object.keys(files.reduce(function(o,f){o[f.hood]=1;return o},{})).map(function(n){return '<option value="'+esc(n)+'">'}).join('');
+  $('countInfo').textContent='تعداد کل فایل‌ها: '+fa(files.length);
+}
+
+function card(f){
+  var rent=f.type==='رهن و اجاره';
+  var specs=[['متراژ',f.area!=null?fa(f.area):null],['طبقه',f.floor!=null?fa(f.floor):null],['ساخت',f.year!=null?toFaYear(f.year):null],['خواب',f.rooms!=null?fa(f.rooms):null]]
+    .filter(function(x){return x[1]!=null});
+  var cols=specs.length||1;
+  return '<article class="card" data-id="'+f.id+'">'+
+    '<div class="row1"><div><div class="price">'+(rent?'<small>ودیعه</small>':'')+esc(money(f.price))+'<small>تومان</small></div>'+
+    (rent&&f.rent!=null?'<div class="rent">اجاره‌ی ماهانه: '+esc(money(f.rent))+'</div>':'')+'</div>'+
+    '<span class="tag'+(f.archived?' arch':'')+'">'+esc(f.archived?'بایگانی':f.type)+'</span></div>'+
+    '<div class="where">'+esc(f.hood)+' <span class="addr">'+esc(f.kind||'')+'</span></div>'+
+    (f.addr?'<div class="addr">'+esc(f.addr)+'</div>':'')+
+    (specs.length?'<div class="specs" style="grid-template-columns:repeat('+cols+',1fr)">'+specs.map(function(x){return '<div><span>'+x[0]+'</span><b>'+x[1]+'</b></div>'}).join('')+'</div>':'')+
+    ((f.feats&&f.feats.length)?'<div class="feat">'+f.feats.map(function(x){return '<i>'+esc(x)+'</i>'}).join('')+'</div>':'')+
+    (f.notes?'<div class="note">'+esc(f.notes)+'</div>':'')+
+    ((f.owner||f.phone)?'<div class="owner">مالک: '+esc(f.owner||'')+' '+esc(f.phone||'')+'</div>':'')+
+    '<div class="actions">'+
+      (f.phone?'<button class="btn main" data-act="call">تماس</button>':'')+
+      '<button class="btn" data-act="share">ارسال</button>'+
+      '<button class="btn" data-act="edit">ویرایش</button>'+
+      '<button class="btn" data-act="arch">'+(f.archived?'برگرداندن':'بایگانی')+'</button>'+
+      '<button class="btn danger" data-act="del">حذف</button>'+
+    '</div></article>';
+}
+function toFaYear(y){return String(y).replace(/\d/g,function(d){return FA[d]})}
+
+/* ---------- sharing text (no owner phone) ---------- */
+function textFor(f){
+  var rent=f.type==='رهن و اجاره',L=[];
+  L.push(f.type+' '+(f.kind||'')+' در '+f.hood);
+  var s=[];
+  if(f.area!=null)s.push('متراژ '+fa(f.area));
+  if(f.rooms!=null)s.push(fa(f.rooms)+' خواب');
+  if(f.floor!=null)s.push('طبقه '+fa(f.floor));
+  if(f.year!=null)s.push('سال ساخت '+toFaYear(f.year));
+  if(s.length)L.push(s.join('، '));
+  if(f.feats&&f.feats.length)L.push(f.feats.join('، '));
+  L.push((rent?'ودیعه: ':'قیمت: ')+money(f.price)+' تومان');
+  if(rent&&f.rent!=null)L.push('اجاره‌ی ماهانه: '+money(f.rent)+' تومان');
+  if(f.addr)L.push('نشانی: '+f.addr);
+  return L.join('\n');
+}
+function shareText(t){
+  if(navigator.share){navigator.share({text:t}).catch(function(){})}
+  else if(navigator.clipboard){navigator.clipboard.writeText(t).then(function(){toast('کپی شد')},function(){toast('کپی نشد')})}
+  else toast('مرورگر اجازه‌ی ارسال نمی‌ده');
+}
+
+/* ---------- toast ---------- */
+var tt;function toast(m){var t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(tt);tt=setTimeout(function(){t.classList.remove('show')},2400)}
+
+/* ---------- sheets ---------- */
+function openSheet(id){$('veil').classList.add('open');$(id).classList.add('open')}
+function closeSheets(){$('veil').classList.remove('open');$('formSheet').classList.remove('open');$('setSheet').classList.remove('open')}
+$('veil').onclick=closeSheets;$('btnCancel').onclick=closeSheets;$('btnCloseSet').onclick=closeSheets;
+
+var editingId=null;
+function setPriceLabel(){var rent=$('a_type').value==='رهن و اجاره';$('a_priceLabel').textContent=rent?'ودیعه / رهن':'قیمت کل';$('rentBox').hidden=!rent}
+$('a_type').onchange=setPriceLabel;
+$('a_type').innerHTML=TYPES.map(function(t){return '<option>'+t+'</option>'}).join('');
+$('a_kind').innerHTML=KINDS.map(function(t){return '<option>'+t+'</option>'}).join('');
+$('fKind').innerHTML+=KINDS.map(function(t){return '<option>'+t+'</option>'}).join('');
+$('a_feats').innerHTML=FEATS.map(function(t,i){return '<label><input type="checkbox" value="'+t+'"> '+t+'</label>'}).join('');
+
+function splitMoney(m){if(m==null)return ['',1];return m>=1000?[String(Math.round(m/10)/100),1000]:[String(m),1]}
+function openForm(f){
+  editingId=f?f.id:null;
+  $('formTitle').textContent=f?'ویرایش فایل':'فایل جدید';
+  $('a_type').value=f?f.type:(F.type||TYPES[0]);
+  $('a_kind').value=f?f.kind:KINDS[0];
+  $('a_hood').value=f?f.hood:(F.hood||'');
+  ['area','floor','rooms','year','units','addr','owner','phone','notes'].forEach(function(k){
+    var v=f&&f[k]!=null?f[k]:'';$('a_'+k).value=v});
+  var p=splitMoney(f?f.price:null);$('a_price').value=p[0]?toFaDigits(p[0]):'';$('a_pu').value=String(f?p[1]:1000);
+  var r=splitMoney(f?f.rent:null);$('a_rent').value=r[0]?toFaDigits(r[0]):'';$('a_ru').value=String(f&&f.rent!=null?r[1]:1);
+  Array.prototype.forEach.call($('a_feats').querySelectorAll('input'),function(c){c.checked=!!(f&&f.feats&&f.feats.indexOf(c.value)>=0)});
+  setPriceLabel();openSheet('formSheet');
+}
+function toFaDigits(s){return String(s).replace(/\d/g,function(d){return FA[d]})}
+
+$('btnAdd').onclick=function(){openForm(null)};
+$('btnSave').onclick=function(){
+  var hood=$('a_hood').value.trim();
+  var pv=num($('a_price').value);
+  if(!hood){toast('نام محله رو وارد کن');$('a_hood').focus();return}
+  if(pv==null){toast('قیمت یا ودیعه رو وارد کن');$('a_price').focus();return}
+  var rv=num($('a_rent').value);
+  var rec={
+    id:editingId||uid(),createdAt:Date.now(),archived:false,
+    type:$('a_type').value,kind:$('a_kind').value,hood:hood,
+    area:num($('a_area').value),floor:num($('a_floor').value),rooms:num($('a_rooms').value),
+    year:num($('a_year').value),units:$('a_units').value.trim()||null,
+    price:pv*(+$('a_pu').value),
+    rent:$('a_type').value==='رهن و اجاره'&&rv!=null?rv*(+$('a_ru').value):null,
+    addr:$('a_addr').value.trim(),owner:$('a_owner').value.trim(),phone:toEn($('a_phone').value),notes:$('a_notes').value.trim(),
+    feats:Array.prototype.filter.call($('a_feats').querySelectorAll('input'),function(c){return c.checked}).map(function(c){return c.value})
+  };
+  if(editingId){var i=files.findIndex(function(x){return x.id===editingId});if(i>=0){rec.createdAt=files[i].createdAt;rec.archived=files[i].archived;files[i]=rec}}
+  else files.unshift(rec);
+  save();closeSheets();render();toast('فایل ذخیره شد');
+};
+
+/* ---------- list actions ---------- */
+$('list').addEventListener('click',function(e){
+  var b=e.target.closest('button');if(!b)return;
+  if(b.id==='btnSample'){addSamples();return}
+  var c=e.target.closest('.card');if(!c||!b.dataset.act)return;
+  var f=files.find(function(x){return x.id===c.dataset.id});if(!f)return;
+  var a=b.dataset.act;
+  if(a==='call'){location.href='tel:'+f.phone}
+  else if(a==='share'){shareText(textFor(f))}
+  else if(a==='edit'){openForm(f)}
+  else if(a==='arch'){f.archived=!f.archived;save();render();toast(f.archived?'بایگانی شد':'به فایل‌های فعال برگشت')}
+  else if(a==='del'){if(confirm('این فایل برای همیشه حذف بشه؟')){files=files.filter(function(x){return x.id!==f.id});save();render()}}
+});
+$('summary').addEventListener('click',function(e){
+  if(e.target.id==='btnShareAll'){
+    var list=files.filter(function(f){return match(f,false)});
+    shareText(list.map(textFor).join('\n\n— — —\n\n'));
+  }
+});
+$('typeChips').addEventListener('click',function(e){var b=e.target.closest('.chip');if(!b)return;F.type=b.dataset.type;render()});
+$('hoods').addEventListener('click',function(e){var b=e.target.closest('.tab');if(!b)return;F.hood=b.dataset.hood;render()});
+
+/* ---------- filters ---------- */
+['fMin','fMax','fAreaMin','fAreaMax','fQ'].forEach(function(id){$(id).addEventListener('input',render)});
+$('fUnit').onchange=render;
+$('fRooms').onchange=function(){F.rooms=this.value;render()};
+$('fKind').onchange=function(){F.kind=this.value;render()};
+$('fArch').onchange=function(){F.arch=this.checked;render()};
+$('btnAdv').onclick=function(){$('adv').classList.toggle('open')};
+
+/* ---------- samples ---------- */
+function addSamples(){
+  var now=Date.now();
+  files.push(
+    {id:uid(),createdAt:now,archived:false,type:'فروش',kind:'آپارتمان',hood:'نمونه: ونک',area:128,floor:4,rooms:3,year:1398,units:null,price:75000,rent:null,addr:'خیابان نمونه، کوچه‌ی اول',owner:'آقای نمونه',phone:'',notes:'نورگیر عالی، فول امکانات',feats:['پارکینگ','انباری','آسانسور']},
+    {id:uid(),createdAt:now-1,archived:false,type:'فروش',kind:'آپارتمان',hood:'نمونه: ونک',area:95,floor:2,rooms:2,year:1395,units:null,price:52500,rent:null,addr:'',owner:'',phone:'',notes:'',feats:['پارکینگ']},
+    {id:uid(),createdAt:now-2,archived:false,type:'رهن و اجاره',kind:'آپارتمان',hood:'نمونه: سعادت‌آباد',area:110,floor:5,rooms:2,year:1401,units:null,price:3000,rent:25,addr:'',owner:'',phone:'',notes:'',feats:['آسانسور','بالکن']}
+  );
+  save();render();toast('نمونه‌ها اضافه شد؛ بعداً حذفشون کن');
+}
+
+/* ---------- backup / restore ---------- */
+$('btnSettings').onclick=function(){openSheet('setSheet')};
+$('btnBackup').onclick=function(){
+  var data=JSON.stringify({app:'zoonkan',version:1,exportedAt:new Date().toISOString(),files:files},null,1);
+  var name='zoonkan-backup-'+new Date().toISOString().slice(0,10)+'.json';
+  try{
+    var file=new File([data],name,{type:'application/json'});
+    if(navigator.canShare&&navigator.canShare({files:[file]})){navigator.share({files:[file]}).catch(function(){});return}
+  }catch(e){}
+  var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([data],{type:'application/json'}));a.download=name;
+  document.body.appendChild(a);a.click();a.remove();toast('فایل پشتیبان آماده شد');
+};
+$('btnRestore').onclick=function(){$('restoreFile').click()};
+$('restoreFile').onchange=function(){
+  var r=this.files[0];if(!r)return;var rd=new FileReader();
+  rd.onload=function(){
+    try{
+      var d=JSON.parse(rd.result);var arr=Array.isArray(d)?d:d.files;
+      if(!Array.isArray(arr))throw 0;
+      var have={};files.forEach(function(f){have[f.id]=1});
+      var added=0;arr.forEach(function(f){if(f&&f.id&&f.hood&&!have[f.id]){files.push(f);added++}});
+      save();render();closeSheets();toast(fa(added)+' فایل بازیابی شد');
+    }catch(e){toast('این فایل پشتیبان معتبر نیست')}
+  };
+  rd.readAsText(r);this.value='';
+};
+
+/* ---------- home-screen icon + offline ---------- */
+try{
+  var cv=document.createElement('canvas');cv.width=cv.height=180;var x=cv.getContext('2d');
+  x.fillStyle='#0b6fd4';x.fillRect(0,0,180,180);
+  x.fillStyle='#ffffff';x.beginPath();x.moveTo(40,62);x.lineTo(76,62);x.lineTo(88,76);x.lineTo(140,76);x.lineTo(140,136);x.lineTo(40,136);x.closePath();x.fill();
+  x.fillStyle='#0f9d63';x.fillRect(52,94,76,6);x.fillRect(52,108,56,6);
+  $('touchIcon').href=cv.toDataURL('image/png');
+}catch(e){}
+if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)){navigator.serviceWorker.register('sw.js').catch(function(){})}
+
+render();
+})();
+</script>
+</body>
+</html>
